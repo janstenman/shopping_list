@@ -26,14 +26,28 @@ function onAddItemSubmit(e) {
   // Check for edit mode
   if (isEditMode) {
     const itemToEdit = itemList.querySelector('.edit-mode');
+    const nextItem = itemToEdit.nextElementSibling;
     removeItemFromStorage(itemToEdit.textContent);
     // itemToEdit.classList.remove('.edit-mode');
     itemToEdit.remove();
     isEditMode = false;
-  }
+    //Create list item
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(newItem));
 
-  //Create item DOM element
-  addItemToDOM(newItem);
+    const button = createButton('remove-item', 'btn-link', 'text-red');
+    li.appendChild(button);
+
+    //Add li to the DOM
+    itemList.insertBefore(li, nextItem);
+  } else if (checkIfItemExists(newItem)) {
+    alert('That item already exists');
+    return;
+  } else {
+    console.log('new item');
+    //Create item DOM element
+    addItemToDOM(newItem);
+  }
 
   //Add item to local storage
   addItemToStorage(newItem);
@@ -91,9 +105,16 @@ function getItemsFromStorage() {
 function onClickItem(e) {
   if (e.target.parentElement.classList.contains('remove-item')) {
     removeItem(e.target.parentElement.parentElement);
+  } else if (e.target.tagName === 'UL') {
+    return;
   } else {
     setItemToEdit(e.target);
   }
+}
+
+function checkIfItemExists(item) {
+  const itemsFromStorage = getItemsFromStorage();
+  return itemsFromStorage.includes(item);
 }
 
 function setItemToEdit(item) {
